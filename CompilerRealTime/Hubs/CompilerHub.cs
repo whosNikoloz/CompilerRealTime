@@ -16,11 +16,11 @@ namespace CompilerRealTime.Hubs
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task CompileAndExecuteCode(string code, string input)
+        public async Task CompileAndExecuteCode(string code)
         {
             try
             {
-                await _compilerService.CompileAndExecute(code, input);
+                await _compilerService.CompileAndExecute(code);
             }
             catch (Exception ex)
             {
@@ -31,16 +31,11 @@ namespace CompilerRealTime.Hubs
             }
         }
 
-        public override Task OnConnectedAsync()
+        public async Task ProvideInput(string userInput)
         {
-            // Perform any connection-specific logic
-            return base.OnConnectedAsync();
-        }
-
-        public override Task OnDisconnectedAsync(Exception exception)
-        {
-            // Perform any disconnection-specific logic
-            return base.OnDisconnectedAsync(exception);
+            // Handle the provided input (e.g., store it, use it in compilation, etc.)
+            // You can continue the compilation process here
+            //await Clients.Caller.SendAsync("ReceiveOutput", compiledOutput);
         }
     }
 }

@@ -20,7 +20,7 @@ namespace CompilerRealTime.Services
             _hubContext = hubContext ?? throw new ArgumentNullException(nameof(hubContext));
         }
 
-        public async Task CompileAndExecute(string code, string input)
+        public async Task CompileAndExecute(string code)
         {
             try
             {
@@ -41,7 +41,17 @@ namespace CompilerRealTime.Services
                     MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
                     MetadataReference.CreateFromFile(Assembly.Load("System.Runtime").Location),
-                    MetadataReference.CreateFromFile(Assembly.Load("System.Runtime.Extensions").Location)
+                    MetadataReference.CreateFromFile(Assembly.Load("System.Runtime.Extensions").Location),
+                    MetadataReference.CreateFromFile(Assembly.Load("System.Collections.NonGeneric").Location),
+                    MetadataReference.CreateFromFile(Assembly.Load("System.Collections").Location),
+                    MetadataReference.CreateFromFile(Assembly.Load("System.Linq").Location),
+                    MetadataReference.CreateFromFile(Assembly.Load("System.Threading.Tasks").Location),
+                    MetadataReference.CreateFromFile(Assembly.Load("System.IO").Location),
+                    MetadataReference.CreateFromFile(Assembly.Load("System.Net.Primitives").Location),
+                    MetadataReference.CreateFromFile(Assembly.Load("System.ComponentModel").Location),
+                    MetadataReference.CreateFromFile(Assembly.Load("System.ComponentModel.Primitives").Location),
+                    MetadataReference.CreateFromFile(Assembly.Load("System.Runtime.InteropServices").Location),
+                    MetadataReference.CreateFromFile(Assembly.Load("System.Runtime.InteropServices.RuntimeInformation").Location)
                 };
 
                 // Create a compilation context with syntax trees and references
@@ -119,7 +129,7 @@ namespace CompilerRealTime.Services
             await _hubContext.Clients.All.SendAsync("ReceiveCompilationUpdate", new CompilationUpdate
             {
                 Success = false,
-                Output = errorMessage,
+                Output = null,
                 Error = errorMessage
             });
         }

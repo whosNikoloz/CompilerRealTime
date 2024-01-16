@@ -38,6 +38,6 @@ app.UseCors("reactapp");
 app.MapControllers();
 
 // Map SignalR hub
-app.MapHub<CompilerHub>("/chsarpcompiler");
+app.MapHub<CompilerHub>("/csharpTerminal");
 
 app.Run();
