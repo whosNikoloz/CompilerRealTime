@@ -20,14 +20,14 @@ namespace CompilerRealTime.Hubs
         {
             try
             {
-                await _compilerService.CompileAndExecute(code);
+                await _compilerService.CompileAndExecute(code, Context.ConnectionId);
             }
             catch (Exception ex)
             {
                 // Log the exception instead of writing to the console
                 _logger.LogError(ex, "Error during code compilation and execution");
                 // You can also send an error message to the client if needed
-                await Clients.Caller.SendAsync("CompilationError", ex.Message);
+                await Clients.Client(Context.ConnectionId).SendAsync("CompilationError", ex.Message);
             }
         }
 

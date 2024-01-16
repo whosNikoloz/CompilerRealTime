@@ -20,7 +20,7 @@ namespace CompilerRealTime.Services
             _hubContext = hubContext ?? throw new ArgumentNullException(nameof(hubContext));
         }
 
-        public async Task CompileAndExecute(string code)
+        public async Task CompileAndExecute(string code ,string ClientId)
         {
             try
             {
@@ -65,16 +65,16 @@ namespace CompilerRealTime.Services
                 {
                     var emitResult = compilation.Emit(stream);
 
-                    await SendCompilationUpdate(emitResult, stream);
+                    await SendCompilationUpdate(emitResult, stream , ClientId);
                 }
             }
             catch (Exception ex)
             {
-                await SendCompilationError(ex.Message);
+                await SendCompilationError(ex.Message , ClientId);
             }
         }
 
-        private async Task SendCompilationUpdate(EmitResult emitResult, MemoryStream stream)
+        private async Task SendCompilationUpdate(EmitResult emitResult, MemoryStream stream, string ClientId)
         {
             if (emitResult.Success)
             {
@@ -105,7 +105,7 @@ namespace CompilerRealTime.Services
                             Console.SetError(originalError);
                         }
 
-                        await _hubContext.Clients.All.SendAsync("ReceiveCompilationUpdate", new CompilationUpdate
+                        await _hubContext.Clients.Client(ClientId).SendAsync("ReceiveCompilationUpdate", new CompilationUpdate
                         {
                             Success = true,
                             Output = outputWriter.ToString(),
@@ -115,18 +115,18 @@ namespace CompilerRealTime.Services
                 }
                 else
                 {
-                    await SendCompilationError("No suitable entry point found in the code.");
+                    await SendCompilationError("No suitable entry point found in the code." , ClientId);
                 }
             }
             else
             {
-                await SendCompilationError(string.Join(Environment.NewLine, emitResult.Diagnostics));
+                await SendCompilationError(string.Join(Environment.NewLine, emitResult.Diagnostics), ClientId);
             }
         }
 
-        private async Task SendCompilationError(string errorMessage)
+        private async Task SendCompilationError(string errorMessage ,string ClientId)
         {
-            await _hubContext.Clients.All.SendAsync("ReceiveCompilationUpdate", new CompilationUpdate
+            await _hubContext.Clients.Client(ClientId).SendAsync("ReceiveCompilationUpdate", new CompilationUpdate
             {
                 Success = false,
                 Output = null,
